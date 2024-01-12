@@ -2,7 +2,7 @@ package com.arslan.store.serviceimpl;
 
 import com.arslan.store.constants.StoreConstants;
 import com.arslan.store.dao.UserDao;
-import com.arslan.store.pojo.User;
+import com.arslan.store.model.User;
 import com.arslan.store.service.UserService;
 import com.arslan.store.utils.StoreUtils;
 import lombok.extern.slf4j.Slf4j;

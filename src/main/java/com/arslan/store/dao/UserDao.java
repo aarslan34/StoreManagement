@@ -1,7 +1,7 @@
 package com.arslan.store.dao;
 
 
-import com.arslan.store.pojo.User;
+import com.arslan.store.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 

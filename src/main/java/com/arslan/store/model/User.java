@@ -1,4 +1,4 @@
-package com.arslan.store.pojo;
+package com.arslan.store.model;
 
 
 import jakarta.persistence.*;
