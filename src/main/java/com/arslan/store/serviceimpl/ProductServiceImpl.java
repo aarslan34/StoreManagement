@@ -7,6 +7,7 @@ import com.arslan.store.model.Product;
 import com.arslan.store.service.ProductService;
 import com.arslan.store.utils.StoreUtils;
 import com.arslan.store.wrapper.ProductWrapper;
+import jakarta.mail.Store;
 import jdk.jfr.Experimental;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,16 +26,17 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     ProductDao productDao;
+
     @Override
     public ResponseEntity<String> addNewProduct(Map<String, String> requestMap) {
         log.info("inside serviceImpl");
         try {
-            if(validateProductMap(requestMap, false)){
+            if (validateProductMap(requestMap, false)) {
                 productDao.save(getProductFromMap(requestMap, false));
                 return StoreUtils.getResponseEntity("Product added successfully", HttpStatus.OK);
             }
             return StoreUtils.getResponseEntity(StoreConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return StoreUtils.getResponseEntity(StoreConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -43,9 +45,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<List<ProductWrapper>> getAllProduct() {
-        try{
+        try {
             return new ResponseEntity<>(productDao.getAllProducts(), HttpStatus.OK);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -55,24 +57,82 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<String> updateProduct(Map<String, String> requestMap) {
         try {
-            if (validateProductMap(requestMap, true)){
-               Optional<Product> optional = productDao.findById(Integer.parseInt(requestMap.get("id")));
+            if (validateProductMap(requestMap, true)) {
+                Optional<Product> optional = productDao.findById(Integer.parseInt(requestMap.get("id")));
 
-               if(!optional.isEmpty()) {
-                   Product product = getProductFromMap(requestMap, true);
-                   product.setStatus(optional.get().getStatus());
-                   productDao.save(product);
-                   return StoreUtils.getResponseEntity("Product updated successfully", HttpStatus.OK);
-               }else {
-                   return StoreUtils.getResponseEntity("Product id does not exist.", HttpStatus.OK);
-               }
-            }else {
+                if (!optional.isEmpty()) {
+                    Product product = getProductFromMap(requestMap, true);
+                    product.setStatus(optional.get().getStatus());
+                    productDao.save(product);
+                    return StoreUtils.getResponseEntity("Product updated successfully", HttpStatus.OK);
+                } else {
+                    return StoreUtils.getResponseEntity("Product id does not exist.", HttpStatus.OK);
+                }
+            } else {
                 return StoreUtils.getResponseEntity(StoreConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return StoreUtils.getResponseEntity(StoreConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> deleteProduct(Integer id) {
+        try {
+            Optional optional = productDao.findById(id);
+            if (!optional.isEmpty()) {
+                productDao.deleteById(id);
+
+                return StoreUtils.getResponseEntity("Product deleted successfully", HttpStatus.OK);
+            }
+
+            return StoreUtils.getResponseEntity("Product id does not exist", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return StoreUtils.getResponseEntity(StoreConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> updateStatus(Map<String, String> requestMap) {
+
+        try {
+            Optional optional = productDao.findById(Integer.parseInt(requestMap.get("id")));
+
+            if(!optional.isEmpty()){
+                productDao.updateProductStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+
+                return StoreUtils.getResponseEntity("Product status updated successfully", HttpStatus.OK);
+            }else {
+                return StoreUtils.getResponseEntity("Product id does not exist", HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return StoreUtils.getResponseEntity(StoreConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<ProductWrapper>> getByCategory(Integer id) {
+
+        try{
+            return new ResponseEntity<>(productDao.getProductByCategory(id), HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<ProductWrapper> getProductById(Integer id) {
+
+        try {
+            return new ResponseEntity<>(productDao.getProductById(id), HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ProductWrapper(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private Product getProductFromMap(Map<String, String> requestMap, boolean isAdd) {
@@ -80,9 +140,9 @@ public class ProductServiceImpl implements ProductService {
         category.setId(Integer.parseInt(requestMap.get("categoryId")));
 
         Product product = new Product();
-        if(isAdd){
+        if (isAdd) {
             product.setId(Integer.parseInt(requestMap.get("id")));
-        }else{
+        } else {
             product.setStatus("true");
         }
         product.setCategory(category);
@@ -96,10 +156,10 @@ public class ProductServiceImpl implements ProductService {
 
     private boolean validateProductMap(Map<String, String> requestMap, boolean validateId) {
 
-        if(requestMap.containsKey("name")) {
+        if (requestMap.containsKey("name")) {
             if (requestMap.containsKey("id") && validateId) {
                 return true;
-            }else if(!validateId){
+            } else if (!validateId) {
                 return true;
             }
         }
