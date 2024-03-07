@@ -14,10 +14,11 @@ import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -27,6 +28,15 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     BillDao billDao;
+
+    @Override
+    public ResponseEntity<List<Bill>> getBills() {
+        List<Bill> list = new ArrayList<>();
+        list = billDao.getAllBills();
+
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
     @Override
     public ResponseEntity<String> generateReport(Map<String, Object> requestMap) {
         log.info("Inside generateReport");
@@ -174,20 +184,6 @@ public class BillServiceImpl implements BillService {
     }
 
     private boolean validateRequestMap(Map<String, Object> requestMap) {
-//        log.info("inside validateRequestMap");
-//        log.info(String.valueOf(requestMap.containsKey("fileName")));
-//        log.info(String.valueOf(requestMap.containsKey("contactNumber")));
-//        log.info(String.valueOf(requestMap.containsKey("email")));
-//        log.info(String.valueOf(requestMap.containsKey("paymentMethod")));
-//        log.info(String.valueOf(requestMap.containsKey("productDetails")));
-//        log.info(String.valueOf(requestMap.containsKey("totalAmount")));
-//        boolean b = requestMap.containsKey("fileName") &&
-//                requestMap.containsKey("contactNumber") &&
-//                requestMap.containsKey("email") &&
-//                requestMap.containsKey("paymentMethod") &&
-//                requestMap.containsKey("productDetails") &&
-//                requestMap.containsKey("totalAmount");
-//        log.info("overall validate from method " + String.valueOf(b));
 
         return requestMap.containsKey("fileName") &&
                 requestMap.containsKey("contactNumber") &&
