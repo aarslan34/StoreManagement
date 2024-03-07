@@ -131,7 +131,7 @@ public class BillServiceImpl implements BillService {
                 return headerFont;
 
             case "Data":
-                Font dataFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 11, BaseColor.WHITE);
+                Font dataFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 11, BaseColor.BLACK);
                 dataFont.setStyle(Font.BOLD);
                 return dataFont;
             default:
