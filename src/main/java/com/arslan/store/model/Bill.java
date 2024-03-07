@@ -25,6 +25,9 @@ public class Bill implements Serializable {
     @Column(name = "uuid")
     private String uuid;
 
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "email")
     private String email;
 
